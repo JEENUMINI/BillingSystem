@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<h1>Products</h1>
+{% for product in products %}
+{{product.product_name}}
+<a href="{%url 'editproduct' product.id %}">Edit</a>
+<a href="{%url 'delete' product.id %}">Delete</a>
+<hr>
+{% endfor %}
+</body>
+</html>

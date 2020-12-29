@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Purchases</h1>
+<table>
+<tr>
+    <td>Product</td>
+    <td>Quantity</td>
+    <td>PurchasePrice</td>
+    <td>SellingPrice</td>
+    <td>PurchaseDate</td>
+</tr>
+{% for purchase in purchases %}
+<tr>
+<td>{{purchase.product}}</td>
+    <td>{{purchase.qty}}</td>
+    <td>{{purchase.purchase_price}}</td>
+    <td>{{purchase.selling_price}}</td>
+    <td>{{purchase.purchase_date}}</td>
+    <td><a href="{%url 'editpurchase' purchase.id %}">Edit</a></td>
+    <td><a href="{%url 'deletepurchase' purchase.id %}">Delete</a></td>
+    </tr>
+{% endfor %}
+    </table>
+
+</body>
+</html>
