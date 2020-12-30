@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.views.generic import TemplateView
-from billing.forms import ProductsForm,PurchaseForm
-from billing.models import Products,Purchase
+from billing.forms import ProductsForm,PurchaseForm,OrderForm,OrderLinesForm
+from billing.models import Products,Purchase,Order,OrderLines
 
 # Create your views here.
 
@@ -127,6 +127,57 @@ class DeletePurchase(TemplateView):
         purchases=self.get_query_set(kwargs.get("pk"))
         purchases.delete()
         return redirect("listpurchases")
+
+class OrderView(TemplateView):
+    model=Order
+    template_name = "billing/order.html"
+    context={}
+
+    def get(self, request, *args, **kwargs):
+        form=OrderForm()
+        self.context["form"]=form
+        return render(request,self.template_name,self.context)
+
+    def post(self, request, *args, **kwargs):
+        form=OrderForm(request.POST)
+        if form.is_valid():
+            billnum=form.cleaned_data.get("billnumber")
+            form.save()
+            return redirect("orderlines",billno=billnum)
+        else:
+            self.context["form"]=form
+            return render(request,self.template_name,self.context)
+
+class OrderLinesView(TemplateView):
+    model=OrderLines
+    template_name = "billing/orderlines.html"
+    context={}
+
+    def get(self, request, *args, **kwargs):
+        billnum=kwargs.get("billno")
+        print(billnum)
+        bill=Order.objects.get(billnumber=billnum)
+        form=OrderLinesForm(initial={"bill_number":bill})
+        self.context["form"]=form
+        return render(request,self.template_name,self.context)
+
+    def post(self, request, *args, **kwargs):
+        form=OrderLinesForm(request.POST)
+        if form.is_valid():
+            billnum=form.cleaned_data.get("bill_number")
+            product_name=form.cleaned_data.get("product_name")
+            product_qty=form.cleaned_data.get("product_qty")
+            print(billnum,product_name,product_qty)
+            bill = Order.objects.get(billnumber=billnum)
+            form = OrderLinesForm(initial={"bill_number": bill})
+            self.context["form"] = form
+            return render(request,self.template_name,self.context)
+        else:
+            self.context["form"] = form
+            return render(request, self.template_name, self.context)
+
+
+
 
 
 
