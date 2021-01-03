@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.shortcuts import render,redirect
 from django.views.generic import TemplateView
 from billing.forms import ProductsForm,PurchaseForm,OrderForm,OrderLinesForm
@@ -134,7 +135,11 @@ class OrderView(TemplateView):
     context={}
 
     def get(self, request, *args, **kwargs):
-        form=OrderForm()
+        orders=Order.objects.all().last()
+        billnumber=int(orders.billnumber)
+        billnumber+=1
+        billnumber=str(billnumber)
+        form=OrderForm(initial={"billnumber":billnumber})
         self.context["form"]=form
         return render(request,self.template_name,self.context)
 
@@ -152,32 +157,48 @@ class OrderLinesView(TemplateView):
     model=OrderLines
     template_name = "billing/orderlines.html"
     context={}
-
     def get(self, request, *args, **kwargs):
         billnum=kwargs.get("billno")
         print(billnum)
         bill=Order.objects.get(billnumber=billnum)
         form=OrderLinesForm(initial={"bill_number":bill})
         self.context["form"]=form
-        return render(request,self.template_name,self.context)
+        return render(request, self.template_name, self.context)
 
     def post(self, request, *args, **kwargs):
         form=OrderLinesForm(request.POST)
         if form.is_valid():
+            billnum = kwargs.get("billno")
+            product_name = form.cleaned_data.get("product_name")
             billnum=form.cleaned_data.get("bill_number")
-            product_name=form.cleaned_data.get("product_name")
-            product_qty=form.cleaned_data.get("product_qty")
-            print(billnum,product_name,product_qty)
+            product_qy=form.cleaned_data.get("product_qty")
+            # print(billnum,product_name,product_qy)
+            getpdtname=Products.objects.get(product_name=product_name)
+            price = Purchase.objects.get(product__product_name=product_name)
+            qtys=price.qty
+            sellprices=price.selling_price
+            amounts=product_qy*sellprices
+            balanceqty=qtys-product_qy
+            price.qty=balanceqty
+            price.save()
+            self.context["price"] = price
             bill = Order.objects.get(billnumber=billnum)
             form = OrderLinesForm(initial={"bill_number": bill})
             self.context["form"] = form
-            return render(request,self.template_name,self.context)
+            val=OrderLines(bill_number=bill,product_name=getpdtname,product_qty=product_qy,amount=amounts)
+            val.save()
+            sumofamount=OrderLines.objects.filter(bill_number=bill).aggregate(Sum('amount'))
+            self.context["total"] = sumofamount
+            # print(sumofamount)
+            bill.bill_total=sumofamount
+            print(bill.bill_total["amount__sum"])
+            Order.objects.filter(billnumber=billnum).update(bill_total= bill.bill_total["amount__sum"])
+            getorderlinesdatas=OrderLines.objects.filter(bill_number=bill)
+            self.context["forms"]=getorderlinesdatas
+            return render(request, self.template_name, self.context)
         else:
             self.context["form"] = form
             return render(request, self.template_name, self.context)
-
-
-
 
 
 

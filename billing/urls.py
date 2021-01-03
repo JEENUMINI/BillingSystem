@@ -28,5 +28,5 @@ path('listpurchases',ListPurchases.as_view(),name="listpurchases"),
 path('editpurchase/<int:pk>',EditPurchase.as_view(),name="editpurchase"),
 path('deletepurchase/<int:pk>',DeletePurchase.as_view(),name="deletepurchase"),
 path('order',OrderView.as_view(),name="order"),
-path('orderlines<int:billno>',OrderLinesView.as_view(),name="orderlines"),
+path('orderlines/<int:billno>',OrderLinesView.as_view(),name="orderlines"),
 ]

@@ -1,3 +1,5 @@
+from random import choices
+
 from django import forms
 from django.forms import ModelForm
 from billing.models import Products,Purchase,Order,OrderLines
@@ -17,8 +19,13 @@ class OrderForm(ModelForm):
         model=Order
         fields=["billnumber","customer_name","phone_number"]
 
-class OrderLinesForm(ModelForm):
-    # bill_number=forms.CharField(max_length=12)
-    class Meta:
-        model=OrderLines
-        fields=["bill_number","product_name","product_qty"]
+class OrderLinesForm(forms.Form):
+    bill_number=forms.CharField()
+    queryset=Purchase.objects.all().values_list('product__product_name',flat=True)
+    choices=[(name, name) for name in queryset]
+    product_name=forms.ChoiceField(choices=choices,required=False,widget=forms.Select())
+    product_qty=forms.IntegerField()
+
+    # class Meta:
+    #     model = OrderLines
+    #     fields = ["bill_number","product_name","product_qty"]
