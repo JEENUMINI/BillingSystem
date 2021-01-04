@@ -16,26 +16,17 @@
 
 </head>
 <body>
-<h1>Billing</h1>
-
-<form method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" class="btn btn-primary" value="Add Items">
-
-</form>
-{% if total%}
-<h2>Total Amount {{total.amount__sum}}</h2>
-{% endif %}
-<hr>
-{% if forms %}
+<h1>view</h1>
 <table class="table">
     <thead>
         <tr>
             <th><b>Bill Number</b></th>
-            <th><b>Product Name</b></th>
-            <th><b>Product Qty</b></th>
-            <th><b>Amount</b></th>
+            <th><b>Bill Date</b></th>
+            <th><b>Customer Name</b></th>
+            <th><b>Phone Number</b></th>
+            <th><b>Total Bill Amount</b></th>
+            <th><b></b></th>
+            <th><b></b></th>
         </tr>
     </thead>
 
@@ -43,29 +34,24 @@
     <tbody>
         <tr>
             <td>
-            {{formss.bill_number}}
+            {{formss.billnumber}}
             </td>
             <td>
-            {{formss.product_name}}
+            {{formss.bill_date}}
             </td>
             <td>
-            {{formss.product_qty}}
+            {{formss.customer_name}}
             </td>
             <td>
-            {{formss.amount}}
+            {{formss.phone_number}}
             </td>
-
+            <td>
+            {{formss.bill_total}}
+            </td>
         </tr>
     </tbody>
     {% endfor %}
 
 </table>
-{% endif %}
-
-<a href="{% url 'billgenerate' billno=billnumber %}">Bill Generate</a>
-
-<hr>
-
-
 </body>
 </html>

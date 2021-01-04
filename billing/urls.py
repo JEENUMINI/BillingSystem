@@ -15,7 +15,8 @@ Including another URLconf
 """
 
 from django.urls import path
-from billing.views import AddProduct,ListProduct,EditProduct,DeleteProduct,AddPurchase,ListPurchases,EditPurchase,DeletePurchase,OrderView,OrderLinesView
+from billing.views import AddProduct,ListProduct,EditProduct,DeleteProduct,AddPurchase,\
+    ListPurchases,EditPurchase,DeletePurchase,OrderView,OrderLinesView,BillGenerate,View_ToatlBill
 
 urlpatterns = [
 
@@ -29,4 +30,6 @@ path('editpurchase/<int:pk>',EditPurchase.as_view(),name="editpurchase"),
 path('deletepurchase/<int:pk>',DeletePurchase.as_view(),name="deletepurchase"),
 path('order',OrderView.as_view(),name="order"),
 path('orderlines/<int:billno>',OrderLinesView.as_view(),name="orderlines"),
+path("billgenerate/<int:billno>", BillGenerate.as_view(), name="billgenerate"),
+    path("viewbill", View_ToatlBill.as_view(), name="viewtotalbill"),
 ]

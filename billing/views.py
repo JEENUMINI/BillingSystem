@@ -159,6 +159,7 @@ class OrderLinesView(TemplateView):
     context={}
     def get(self, request, *args, **kwargs):
         billnum=kwargs.get("billno")
+        self.context["billnumber"] = billnum
         print(billnum)
         bill=Order.objects.get(billnumber=billnum)
         form=OrderLinesForm(initial={"bill_number":bill})
@@ -199,6 +200,46 @@ class OrderLinesView(TemplateView):
         else:
             self.context["form"] = form
             return render(request, self.template_name, self.context)
+
+class BillGenerate(TemplateView):
+    model=OrderLines
+    template_name = "billing/bill_generate.html"
+    context={}
+    def get_object(self,id):
+        return self.model.objects.get(bill_number=id)
+
+    def get(self, request, *args, **kwargs):
+        billnum=kwargs.get("billno")
+        print(billnum)
+        bill=Order.objects.get(billnumber=billnum)
+        self.context["getorder"]=bill
+        billitems=self.model.objects.values_list("bill_number").last()
+        getallitems=self.model.objects.filter(bill_number=billitems)
+        self.context["getallitems"] = getallitems
+        return render(request,self.template_name,self.context)
+
+class View_ToatlBill(TemplateView):
+    model=Order
+    template_name = "billing/bill_total_views.html"
+    context={}
+    def get_object(self):
+        return self.model.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        allval=self.get_object()
+        self.context["forms"]=allval
+        return render(request,self.template_name,self.context)
+    #
+    # def post(self, request, *args, **kwargs):
+    #     form = OrderForm(request.POST)
+    #     if form.is_valid():
+    #         billnum = form.cleaned_data.get("billnumber")
+    #         return redirect("viewbilldetails", billno=billnum)
+    #     else:
+    #         self.context["form"] = form
+    #         return render(request, self.template_name, self.context)
+
+
 
 
 
