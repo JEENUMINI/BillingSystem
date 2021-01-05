@@ -172,30 +172,28 @@ class OrderLinesView(TemplateView):
             billnum = kwargs.get("billno")
             product_name = form.cleaned_data.get("product_name")
             billnum=form.cleaned_data.get("bill_number")
-            product_qy=form.cleaned_data.get("product_qty")
-            # print(billnum,product_name,product_qy)
+            product_qty=form.cleaned_data.get("product_qty")
             getpdtname=Products.objects.get(product_name=product_name)
-            price = Purchase.objects.get(product__product_name=product_name)
-            qtys=price.qty
-            sellprices=price.selling_price
-            amounts=product_qy*sellprices
-            balanceqty=qtys-product_qy
-            price.qty=balanceqty
-            price.save()
-            self.context["price"] = price
+            products = Purchase.objects.get(product__product_name=product_name)
+            qty=products.qty
+            sellingprice=products.selling_price
+            amount=product_qty*sellingprice
+            balanceqty=qty-product_qty
+            products.qty=balanceqty
+            products.save()
+            self.context["products"] = products
             bill = Order.objects.get(billnumber=billnum)
             form = OrderLinesForm(initial={"bill_number": bill})
             self.context["form"] = form
-            val=OrderLines(bill_number=bill,product_name=getpdtname,product_qty=product_qy,amount=amounts)
-            val.save()
-            sumofamount=OrderLines.objects.filter(bill_number=bill).aggregate(Sum('amount'))
-            self.context["total"] = sumofamount
-            # print(sumofamount)
-            bill.bill_total=sumofamount
-            print(bill.bill_total["amount__sum"])
+            orderlines=OrderLines(bill_number=bill,product_name=getpdtname,product_qty=product_qty,amount=amount)
+            orderlines.save()
+            total=OrderLines.objects.filter(bill_number=bill).aggregate(Sum('amount'))
+            self.context["total"] = total
+            bill.bill_total=total
+            # print(bill.bill_total["amount__sum"])
             Order.objects.filter(billnumber=billnum).update(bill_total= bill.bill_total["amount__sum"])
-            getorderlinesdatas=OrderLines.objects.filter(bill_number=bill)
-            self.context["forms"]=getorderlinesdatas
+            orderlinesdata=OrderLines.objects.filter(bill_number=bill)
+            self.context["orderlinesdata"]=orderlinesdata
             return render(request, self.template_name, self.context)
         else:
             self.context["form"] = form
@@ -212,7 +210,7 @@ class BillGenerate(TemplateView):
         billnum=kwargs.get("billno")
         print(billnum)
         bill=Order.objects.get(billnumber=billnum)
-        self.context["getorder"]=bill
+        self.context["orderdata"]=bill
         billitems=self.model.objects.values_list("bill_number").last()
         getallitems=self.model.objects.filter(bill_number=billitems)
         self.context["getallitems"] = getallitems

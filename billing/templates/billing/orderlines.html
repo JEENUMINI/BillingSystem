@@ -8,7 +8,7 @@
         h1 {
   text-align: center;
   text-transform: uppercase;
-  color: #ebd586;
+  color: black;
 }
 
 
@@ -21,38 +21,38 @@
 <form method="post">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="submit" class="btn btn-primary" value="Add Items">
+    <input type="submit" class="btn btn-primary" value="AddItems">
 
 </form>
 {% if total%}
 <h2>Total Amount {{total.amount__sum}}</h2>
 {% endif %}
 <hr>
-{% if forms %}
+{% if orderlinesdata %}
 <table class="table">
     <thead>
         <tr>
-            <th><b>Bill Number</b></th>
-            <th><b>Product Name</b></th>
-            <th><b>Product Qty</b></th>
+            <th><b>BillNumber</b></th>
+            <th><b>ProductName</b></th>
+            <th><b>ProductQty</b></th>
             <th><b>Amount</b></th>
         </tr>
     </thead>
 
-    {% for formss in forms %}
+    {% for datas in orderlinesdata %}
     <tbody>
         <tr>
             <td>
-            {{formss.bill_number}}
+            {{datas.bill_number}}
             </td>
             <td>
-            {{formss.product_name}}
+            {{datas.product_name}}
             </td>
             <td>
-            {{formss.product_qty}}
+            {{datas.product_qty}}
             </td>
             <td>
-            {{formss.amount}}
+            {{datas.amount}}
             </td>
 
         </tr>
